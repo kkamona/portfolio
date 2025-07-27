@@ -283,6 +283,7 @@ function getNoun(y) {
 }
 
 var movers = [];
+
 var adjectives = ["dark", "color", "whimsical", "shiny", "noisy", "apocalyptic", "insulting", "praise", "scientific"];  // types of adjectives for pizza titles
 var nouns = ["animals", "everyday", "fantasy", "gross", "horror", "jewelry", "places", "scifi"];                        // types of nouns for pizza titles
 
@@ -451,7 +452,7 @@ var resizePizzas = function(size) {
   // Iterates through pizza elements on the page and changes their widths
 function changePizzaSizes(size) {
   var containers = document.querySelectorAll(".randomPizzaContainer");
-  var dx = determineDx(containers[0], size);
+  var dx = determineDx(containers[0], size); 
   for (var i = 0; i < containers.length; i++) {
     containers[i].style.width = (containers[i].offsetWidth + dx) + 'px';
   }
@@ -499,75 +500,9 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
 
 // Moves the sliding background pizzas based on scroll position
-function updatePositions() {
-    window.frame++;
-    window.performance.mark('mark_start_frame');
-
-    var top = document.documentElement.scrollTop / 1250;
-    var sinValues = [0, 1, 2, 3, 4].map(i => Math.sin(top + i));
-
-    // Build transforms in memory first
-    const transforms = [];
-    for (var i = 0; i < window.numMovers; i++) {
-        var pos = sinValues[i % 5] * 100;
-        transforms.push('translateX(' + pos + 'px)');
-    }
-
-    // Apply all transforms in a single pass
-    for (var j = 0; j < window.numMovers; j++) {
-        window.MoverClassObjects[j].style.transform = transforms[j];
-    }
-
-    window.animating = false;
-    window.performance.mark('mark_end_frame');
-    window.performance.measure('measure_frame_duration', 'mark_start_frame', 'mark_end_frame');
-
-    if (frame % 10 === 0) {
-        var times = window.performance.getEntriesByName('measure_frame_duration');
-        logAverageFrame(times);
-    }
-}
-
-
-document.addEventListener('DOMContentLoaded', function () {
-    var cols = 8;
-    var s = 256;
-    // Optimization 5. Animated pizzas for background based on height of browser window
-    var numberOfPizzas = Math.round(window.innerHeight / s) * cols;
-    for (var i = 0; i < numberOfPizzas; i++) {
-        var elem = document.createElement('img');
-        elem.className = 'mover';
-        elem.src = 'images/pizza.webp';
-        elem.style.height = '75px';
-        elem.style.width = '58px';
-        elem.style.left = ((i % cols) * s) + 'px';
-        elem.style.top = (Math.floor(i / cols) * s) + 'px';
-        document.getElementById('movingPizzas1').appendChild(elem);
-    }
-  frame++;
-  //window.performance.mark("mark_start_frame");
-
-  var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-  var phase = scrollTop / 1250;
-
-  for (var i = 0; i < movers.length; i++) {
-    const offset = 100 * Math.sin(phase + (i % 5));
-movers[i].style.transform = `translateX(${offset}px)`;
-movers[i].style.left = movers[i].basicLeft + 'px'; 
-
-  }
-
-  //window.performance.mark("mark_end_frame");
-  //window.performance.measure("measure_frame_duration", "mark_start_frame", "mark_end_frame");
-  if (frame % 10 === 0) {
-    var timesToUpdatePosition = window.performance.getEntriesByName("measure_frame_duration");
-    logAverageFrame(timesToUpdatePosition);
-  }
-}
 
 
 // runs updatePositions on scroll
-//window.addEventListener('scroll', updatePositions);
 let latestScrollY = 0;
 let ticking = false;
 
@@ -604,19 +539,17 @@ function updatePositions() {
 document.addEventListener('DOMContentLoaded', function() {
   var cols = 8;
   var s = 256;
-   
-  for (var i = 0; i < 200; i++) {
+ for (var i = 0; i < 200; i++) {
   var elem = document.createElement('img');
   elem.className = 'mover';
   elem.src = "images/pizza.webp";
   elem.style.height = "100px";
   elem.style.width = "73.333px";
-  //elem.style.position = "absolute";
-
   elem.basicLeft = (i % cols) * s;
   elem.style.top = (Math.floor(i / cols) * s) + 'px';
   movers.push(elem); 
   document.querySelector("#movingPizzas1").appendChild(elem);
 }
+
   updatePositions();
 });
