@@ -465,33 +465,34 @@ function animateWhenReady() {
 
 // Optimization 4. Loop & getting object collection
 function updatePositions() {
-
     window.frame++;
     window.performance.mark('mark_start_frame');
-    var top = (document.body.scrollTop / 1250);
-    var sinPhaseArray = [];
 
-    for (i = 0; i < 5; i++) {
-        sinPhaseArray.push(Math.sin(top + i));
+    var top = document.documentElement.scrollTop / 1250;
+    var sinValues = [0, 1, 2, 3, 4].map(i => Math.sin(top + i));
+
+    // Build transforms in memory first
+    const transforms = [];
+    for (var i = 0; i < window.numMovers; i++) {
+        var pos = sinValues[i % 5] * 100;
+        transforms.push('translateX(' + pos + 'px)');
     }
 
-
-    for (var mover = 0; mover < window.numMovers; mover++) {
-        var pos = sinPhaseArray[mover % 5] * 100;
-        window.MoverClassObjects[mover].style.transform = 'translateX(' + pos + 'px)';
+    // Apply all transforms in a single pass
+    for (var j = 0; j < window.numMovers; j++) {
+        window.MoverClassObjects[j].style.transform = transforms[j];
     }
 
     window.animating = false;
-
     window.performance.mark('mark_end_frame');
-
     window.performance.measure('measure_frame_duration', 'mark_start_frame', 'mark_end_frame');
 
     if (frame % 10 === 0) {
-        var timesToUpdatePosition = window.performance.getEntriesByName('measure_frame_duration');
-        logAverageFrame(timesToUpdatePosition);
+        var times = window.performance.getEntriesByName('measure_frame_duration');
+        logAverageFrame(times);
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', function () {
     var cols = 8;
